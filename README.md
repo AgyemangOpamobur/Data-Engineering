@@ -1,5 +1,5 @@
 # Real-Time-Data-Streaming-with-Pyspark-Kafka-and-PostgreSQL
-![pipeline](pipeline.png)
+![sensor-pipeline](sensor-pipeline.png)
 
 ## Deployment Instructions for a Standalone Deployment on a Local Machine in a Docker Environment
 
