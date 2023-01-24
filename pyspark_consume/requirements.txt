@@ -1,0 +1,3 @@
+pydantic[dotenv]
+SQLAlchemy==1.4.39
+psycopg2-binary
