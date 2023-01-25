@@ -1,5 +1,5 @@
 # Real-Time-Environmental-Sensor-Readings-with-Pyspark-Kafka-and-PostgreSQL
-![sensor-pipeline](sensor-pipeline.png)
+![sensor-pipeline](sensor-pipeline.jpg)
 
 ## Deployment Instructions for a Standalone Deployment on a Local Machine in a Docker Environment
 
