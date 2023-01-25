@@ -1,4 +1,4 @@
-# Real-Time-Data-Streaming-with-Pyspark-Kafka-and-PostgreSQL
+# Real-Time-Environmental-Sensor-Readings-with-Pyspark-Kafka-and-PostgreSQL
 ![sensor-pipeline](sensor-pipeline.png)
 
 ## Deployment Instructions for a Standalone Deployment on a Local Machine in a Docker Environment
@@ -13,12 +13,12 @@ For Windows users, you need to run the zookeeper-server-stop.bat script.
 
 #### You may now deploy using the following commands:
 ```
-git clone https://github.com/gyasifred/Real-Time-Streaming-with-Pyspark-Kafka-and-Postgresql.git  
-cd Real-Time-Streaming-with-Pyspark-Kafka-and-Postgresql/producer
+git clone https://github.com/AgyemangOpamobur/Real-Time-Environmental-Sensor-Readings-With-Kafka-Pyspark-and-Postgresql.git 
+cd Real-Time-Environmental-Sensor-Readings-With-Kafka-Pyspark-and-Postgresql/producer
 ```
-Unzip streaming_data.zip
+Unzip iot_telemetry_data.zip
 ```
-unzip streaming_data.zip -d .
+unzip iot_telemetry_data.zip -d .
 ```
 Change directory back to the base of the repository and edit the .env_config to provide the environment variable you wish to deploy your application with.
 ```
