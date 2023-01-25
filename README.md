@@ -46,35 +46,47 @@ To check how your data is published to the Kafka broker open a new terminal and 
 docker exec --interactive --tty <kafka container name> kafka-console-consumer.sh --topic temperature_readings --bootstrap-server kafka:9092
 ```
 ```text
-{'id': 'uP', 'room_id/id': 'Room Admin', 'noted_date': '17-10-2018 09:45', 'temp': 38, 'out/in': 'Out'}
-{'id': 'uQ', 'room_id/id': 'Room Admin', 'noted_date': '20-10-2018 05:37', 'temp': 39, 'out/in': 'Out'}
-{'id': 'uR', 'room_id/id': 'Room Admin', 'noted_date': '18-10-2018 14:50', 'temp': 29, 'out/in': 'Out'}
-{'id': 'uS', 'room_id/id': 'Room Admin', 'noted_date': '24-11-2018 10:01', 'temp': 40, 'out/in': 'Out'}
-{'id': 'uT', 'room_id/id': 'Room Admin', 'noted_date': '24-11-2018 04:23', 'temp': 39, 'out/in': 'In'}
-{'id': 'uU', 'room_id/id': 'Room Admin', 'noted_date': '17-10-2018 15:11', 'temp': 40, 'out/in': 'Out'}
-{'id': 'uV', 'room_id/id': 'Room Admin', 'noted_date': '03-09-2018 23:03', 'temp': 35, 'out/in': 'Out'}
-{'id': 'uW', 'room_id/id': 'Room Admin', 'noted_date': '10-09-2018 12:18', 'temp': 36, 'out/in': 'In'}
-{'id': 'uX', 'room_id/id': 'Room Admin', 'noted_date': '10-09-2018 17:28', 'temp': 32, 'out/in': 'In'}
-{'id': 'uY', 'room_id/id': 'Room Admin', 'noted_date': '19-09-2018 20:20', 'temp': 39, 'out/in': 'Out'}
-{'id': 'uZ', 'room_id/id': 'Room Admin', 'noted_date': '14-09-2018 08:08', 'temp': 47, 'out/in': 'Out'}
-{'id': 'va', 'room_id/id': 'Room Admin', 'noted_date': '17-10-2018 23:37', 'temp': 34, 'out/in': 'Out'}
-{'id': 'vb', 'room_id/id': 'Room Admin', 'noted_date': '24-10-2018 07:04', 'temp': 32, 'out/in': 'In'}
-{'id': 'vc', 'room_id/id': 'Room Admin', 'noted_date': '10-08-2018 08:34', 'temp': 40, 'out/in': 'Out'}
-{'id': 'vd', 'room_id/id': 'Room Admin', 'noted_date': '05-12-2018 13:32', 'temp': 35, 'out/in': 'Out'}
-{'id': 've', 'room_id/id': 'Room Admin', 'noted_date': '18-10-2018 00:45', 'temp': 44, 'out/in': 'Out'}
-{'id': 'vf', 'room_id/id': 'Room Admin', 'noted_date': '18-10-2018 13:52', 'temp': 45, 'out/in': 'Out'}
+{"id": "1", "ts": "1595162570", "device": "00:0f:00:70:91:0a", "co": "0", "humidity": "57", "light": "True", "lpg": "0", "motion": "False", "smoke": "0", "temp": "27"}
+{"id": "2", "ts": "1594682448", "device": "b8:27:eb:bf:9d:51", "co": "0", "humidity": "72", "light": "False", "lpg": "0", "motion": "False", "smoke": "0", "temp": "20"}
+{"id": "3", "ts": "1595013088", "device": "00:0f:00:70:91:0a", "co": "0", "humidity": "62", "light": "False", "lpg": "0", "motion": "False", "smoke": "0", "temp": "22"}
+{"id": "4", "ts": "1594850360", "device": "b8:27:eb:bf:9d:51", "co": "0", "humidity": "55", "light": "False", "lpg": "0", "motion": "False", "smoke": "0", "temp": "22"}
+{"id": "5", "ts": "1595040990", "device": "1c:bf:ce:15:ec:4d", "co": "0", "humidity": "79", "light": "True", "lpg": "0", "motion": "False", "smoke": "0", "temp": "22"}
+{"id": "6", "ts": "1594836724", "device": "b8:27:eb:bf:9d:51", "co": "0", "humidity": "61", "light": "False", "lpg": "0", "motion": "False", "smoke": "0", "temp": "23"}
+{"id": "7", "ts": "1594751409", "device": "00:0f:00:70:91:0a", "co": "0", "humidity": "62", "light": "False", "lpg": "0", "motion": "False", "smoke": "0", "temp": "23"}
 ```
 Docker exec into the PostgreSQL database container and run SQL queries  in new terminal 
 ```
 docker exec -ti  <PostgreSQL container name> psql -U <PostgreSQL user> 
 ```
 ```text
-id  | room_location |      window_start      |       window_end       |  avg_temperature  
------+---------------+------------------------+------------------------+-------------------
- 484 | Out           | 2018-09-19 20:00:00+00 | 2018-09-19 20:30:00+00 |              39
- 485 | Out           | 2018-09-19 23:00:00+00 | 2018-09-19 23:30:00+00 |              38
- 214 | In            | 2018-10-22 01:00:00+00 | 2018-10-22 01:30:00+00 |              38
- 215 | In            | 2018-10-22 03:30:00+00 | 2018-10-22 04:00:00+00 |              44
- 294 | In            | 2018-12-03 03:00:00+00 | 2018-12-03 03:30:00+00 |              23
+------------------------------------------
+Batch: 1
+-------------------------------------------
++---+----------+-----------------+----+--------+-----+----+------+-----+-----+--------------------+
+| id|        ts|           device|  co|humidity|light| lpg|motion|smoke| temp|           timestamp|
++---+----------+-----------------+----+--------+-----+----+------+-----+-----+--------------------+
+|343|1594666413|00:0f:00:70:91:0a|0.00|   53.00| True|0.00| False| 0.00|24.00|2023-01-25 11:26:...|
+|344|1594532169|00:0f:00:70:91:0a|0.00|   48.00| True|0.00| False| 0.00|25.00|2023-01-25 11:26:...|
+|345|1594878780|00:0f:00:70:91:0a|0.00|   47.00| True|0.00| False| 0.00|25.00|2023-01-25 11:26:...|
+|346|1594524869|00:0f:00:70:91:0a|0.00|   61.00|False|0.00| False| 0.00|24.00|2023-01-25 11:26:...|
+|347|1595065390|b8:27:eb:bf:9d:51|0.00|   52.00|False|0.00| False| 0.00|22.00|2023-01-25 11:26:...|
+|348|1594955312|b8:27:eb:bf:9d:51|0.00|   54.00|False|0.00| False| 0.00|21.00|2023-01-25 11:26:...|
+|349|1594625175|1c:bf:ce:15:ec:4d|0.00|   61.00| True|0.00| False| 0.00|25.00|2023-01-25 11:26:...|
+|350|1594639633|b8:27:eb:bf:9d:51|0.00|   60.00| True|0.00| False| 0.00|20.00|2023-01-25 11:26:...|
+|351|1595166048|b8:27:eb:bf:9d:51|0.00|   58.00|False|0.00| False| 0.00|18.00|2023-01-25 11:26:...|
+|352|1594926363|00:0f:00:70:91:0a|0.00|   69.00|False|0.00| False| 0.00|23.00|2023-01-25 11:26:...|
+|353|1594755811|1c:bf:ce:15:ec:4d|0.00|   70.00| True|0.00| False| 0.00|21.00|2023-01-25 11:26:...|
+|354|1594802003|00:0f:00:70:91:0a|0.00|   72.00|False|0.00| False| 0.00|18.00|2023-01-25 11:26:...|
+|355|1594715184|00:0f:00:70:91:0a|0.00|   69.00| True|0.00| False| 0.00|22.00|2023-01-25 11:26:...|
+|356|1594862729|b8:27:eb:bf:9d:51|0.00|   69.00|False|0.00| False| 0.00|20.00|2023-01-25 11:26:...|
+|357|1594896309|b8:27:eb:bf:9d:51|0.00|   46.00|False|0.00| False| 0.00|22.00|2023-01-25 11:26:...|
+|358|1594874501|b8:27:eb:bf:9d:51|0.00|   57.00|False|0.00| False| 0.00|23.00|2023-01-25 11:26:...|
+|359|1594891334|b8:27:eb:bf:9d:51|0.00|   59.00|False|0.00| False| 0.00|21.00|2023-01-25 11:26:...|
+|360|1595020102|b8:27:eb:bf:9d:51|0.00|   57.00| True|0.00| False| 0.00|25.00|2023-01-25 11:26:...|
+|361|1594972829|1c:bf:ce:15:ec:4d|0.00|   59.00| True|0.00| False| 0.00|26.00|2023-01-25 11:26:...|
+|362|1594894671|b8:27:eb:bf:9d:51|0.00|   49.00|False|0.00| False| 0.00|24.00|2023-01-25 11:26:...|
++---+----------+-----------------+----+--------+-----+----+------+-----+-----+--------------------+
+only showing top 20 rows
+
 ```
 
