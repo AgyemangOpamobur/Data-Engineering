@@ -1,6 +1,6 @@
 FROM python:3.9.7
 
-LABEL maintainer="Gyasi Frederick gyasifred@gmail.com"
+LABEL maintainer="Agyemang Alex donagyengo@gmail.com"
 
 WORKDIR /usr/src/app
 
