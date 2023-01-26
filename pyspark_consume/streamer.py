@@ -74,7 +74,7 @@ if __name__ == "__main__":
     # posts_time = posts_df3.groupBy(year('ts')).agg({"temp":"count"}).alias("Fahrenheit")
 
 
-    posts_stream = posts_df4.writeStream.trigger(processingTime='10 seconds')\
+    posts_stream = posts_df4.writeStream.trigger(processingTime='15 seconds')\
         .outputMode('update')\
             .option("truncate", "false")\
                 .format("console")\
