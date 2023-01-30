@@ -10,6 +10,6 @@ class SensorReadings(Base):
     window_start = Column(TIMESTAMP(timezone=True), nullable=False)
     window_end = Column(TIMESTAMP(timezone=True), nullable=False)
     device_id = Column(Text, nullable=False)
-    temperature = Column(DOUBLE_PRECISION, nullable=False)
+    fahrenheit = Column(DOUBLE_PRECISION, nullable=False)
     humidity = Column(DOUBLE_PRECISION, nullable=False)
     
