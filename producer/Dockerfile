@@ -11,4 +11,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # exectute start up script
-CMD ["python", "produce.py"]
+CMD ["python", "kafka-producer.py"]
