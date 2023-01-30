@@ -4,17 +4,12 @@ from .database import Base
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 
 class SensorReadings(Base):
-    __tablename__ = "Environment_Readings"
+    __tablename__ ="environment_readings"
 
-    id = Column(Integer, primary_key=True, nullable=False)
-    ts = Column(Text, nullable=False)
-    device = Column(Text, nullable=False)
-    co = Column(DOUBLE_PRECISION, nullable=False)
+    Id = Column(Integer, primary_key=True, nullable=False)
+    window_start = Column(TIMESTAMP(timezone=True), nullable=False)
+    window_end = Column(TIMESTAMP(timezone=True), nullable=False)
+    device_id = Column(Text, nullable=False)
+    temperature = Column(DOUBLE_PRECISION, nullable=False)
     humidity = Column(DOUBLE_PRECISION, nullable=False)
-    light = Column(Text, nullable=False)
-    lpg = Column(Text, nullable=False)
-    motion=Column(Text, nullable=False)
-    smoke = Column(DOUBLE_PRECISION, nullable=False)
-    temp = Column(DOUBLE_PRECISION, nullable=False)
-    timestamp = Column(TIMESTAMP(timezone=True), nullable=False)
     
