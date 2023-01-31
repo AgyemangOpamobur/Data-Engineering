@@ -5,17 +5,21 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
-import time
 from decimal import Decimal
 from pyspark.sql.types import DecimalType
-
-import numpy as np
-
-from consume.foreachatch import foreach_batch_function
+from consume.foreachbatch import foreach_batch_function
 from consume.database import engine
 from consume import models
 
-# create the temperature_reading table
+#funtion to convert celsuis to Fah...
+
+
+def Fahrenheit(df):
+    return df.withColumn(
+        "temp_fa", round((df.temperature*9/5) + 32, 2))
+
+
+# create the environmental_readings table
 models.Base.metadata.create_all(bind=engine)
 
 
@@ -25,87 +29,84 @@ kafka_bootstrap_servers = "kafka:9092"
 
 if __name__ == "__main__":
     spark = SparkSession.builder\
-        .appName("Kafka Pyspark Streamin Learning")\
-            .master("local[*]").getOrCreate()
+        .appName("Kafka Pyspark Streaming Learning")\
+        .master("local[2]")\
+        .config("spark.jars", "postgresql-42.4.0.jar").getOrCreate()
     spark.sparkContext.setLogLevel("ERROR")
-   
+
     posts_df = spark.readStream.format("kafka")\
         .option("kafka.bootstrap.servers", kafka_bootstrap_servers)\
-            .option("subscribe", kafka_topic_name)\
-                .option("startingOffsets", "latest")\
-                    .load()
-    posts_df.printSchema()
+        .option("subscribe", kafka_topic_name)\
+        .option("startingOffsets", "latest")\
+        .load()
+
+    # posts_df.printSchema()
 
     # setting precision to format the columns to 2dp
     Precision = 5
-    Scale = 2    
+    Scale = 2
 
-    posts_df1 = posts_df.selectExpr("CAST(value as STRING)", "timestamp")
-    posts_schema = StructType() \
-        .add("id", StringType())\
-                .add("ts", StringType())\
-                    .add("device", StringType())\
-                        .add("co", DecimalType(Precision,Scale))\
-                            .add("humidity", DecimalType(Precision,Scale))\
-                                .add("light", StringType())\
-                                    .add("lpg", DecimalType(Precision,Scale))\
-                                        .add("motion", StringType())\
-                                            .add("smoke", DecimalType(Precision,Scale))\
-                                                .add("temp", DecimalType(Precision, Scale))\
+    posts_df1 = posts_df.selectExpr(
+        "CAST(key AS STRING)", "CAST(value AS STRING)")
 
-    posts_df2 = posts_df1.select(from_json(col("value"), posts_schema)\
-        .alias("posts"), "timestamp")
-    # posts_df2.printSchema()
+    posts_schema = StructType(fields=[
+        StructField("id", StringType(), False),
+        StructField("ts", StringType(), True),
+        StructField("device", StringType(), True),
+        StructField("co", StringType(), True),
+        StructField("humidity", StringType(), True),
+        StructField("light", StringType(), True),
+        StructField("lpg", StringType(), True),
+        StructField("motion", StringType(), True),
+        StructField("smoke", StringType(), True),
+        StructField("temp", StringType(), True)
+    ])
+    posts_df2 = posts_df1.select(
+        from_json(posts_df1.value, posts_schema).alias("dataframe"))
 
-    # convert temperature to fahrenheit
-    def Fahrenheit():        
-      celsius = np.array(posts_df2['posts.temp'])
-      fahrenheit = (celsius * 9/5) + 32
-      return fahrenheit
-    # posts_df2['posts.temp'] = fahrenheit
+    df_formatted = posts_df2.select(
+        col("dataframe.id").alias("Id"),
+        col("dataframe.ts").alias("ts"),
+        col("dataframe.device").alias("device_id"),
+        col("dataframe.co").alias("co"),
+        col("dataframe.humidity").alias("humidity_level"),
+        col("dataframe.light").alias("light"),
+        col("dataframe.lpg").alias("lpg_level"),
+        col("dataframe.motion").alias("motion"),
+        col("dataframe.smoke").alias("smoke_conc"),
+        col("dataframe.temp").alias("temperature")
+    )
+    # format dat types
+    df = df_formatted.withColumn("Id", df_formatted.Id.cast(IntegerType()))
+    df = df.withColumn("humidity_level", df.humidity_level.cast(
+        DecimalType(Precision, Scale)))
+    df = df.withColumn("temperature", df.temperature.cast(
+        DecimalType(Precision, Scale)))
 
-    posts_df3 = posts_df2.select("posts.*", "timestamp")
-    posts_df3.writeStream.outputMode("append").format('console').start()
-    posts_df4 = posts_df3.groupBy("timestamp")\
-        .agg({"temp": "count"}).alias("posts")
-    posts_df5 = posts_df3.groupBy("ts").agg({"ts":"count"}).alias("ts_count")
-    # posts_df4.printSchema()
-    
-    # posts_time = posts_df3.groupBy(year('ts')).agg({"temp":"count"}).alias("Fahrenheit")
+    # add column for current timestamp
+    post_df_with_tmps = df.withColumn(
+        "timestamp", current_timestamp())
 
+    posts_df3 = post_df_with_tmps.transform(Fahrenheit)
 
-    posts_stream = posts_df4.writeStream.trigger(processingTime='15 seconds')\
-        .outputMode('update')\
-            .option("truncate", "false")\
-                .format("console")\
-                    .start()
-    
-    posts_stream.awaitTermination()
-    
+    # Define  the window to perform transformation on the dataframe
+    # I am subseting the columns here I don't think all the columns are relevant to me
+    # I am performing the agrregation every 3 minutes
+    # I am caluclating  the aveage temperature  and humidity for every device within the period
+    df_window = (posts_df3.withWatermark("timestamp", "15 seconds")
+                 .groupBy(window(posts_df3.timestamp, "15 seconds"), posts_df3.Id, posts_df3.device_id)
+                 .avg("temp_fa", "humidity_level"))
+
     # dataframe to save to PostgreSQL
-    df_final = posts_df1.select(
-        "temp",
-        col("id").alias("log_id"),
-        col("ts").alias("ts"),
-        col("device").alias("device"),
-        col("co").alias("carbon"),
-        col("humidity").alias("humidity"),
-        col("light").alias("light"),
-        col("lpg").alias("lpg"),
-        col("motion").alias("motion"),
-        col("smoke").alias("smoke"),
-        col("temp").alias("temperature"),
-        col("timestamp").alias("timestamp")).orderBy(asc("log_id"))
-        # .orderBy(asc("temp"), asc("ts"))
+    df_final = df_window.select(
+        col("window.start").alias("window_start"),
+        col("window.end").alias("window_end"),
+        col("device_id"),
+        col("avg(temp_fa)").alias("Fahrenheit"), col("avg(humidity_level)").alias("humidity")).orderBy(asc("Id"), asc("window_start"))
 
     query = df_final\
         .writeStream.outputMode("complete").format("jdbc")\
         .foreachBatch(foreach_batch_function).start()
 
     query.awaitTermination()
-
-
-
-
-
-
+    
